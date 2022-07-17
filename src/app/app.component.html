@@ -40,10 +40,10 @@
 			</div>
 		</div>
 		<div class="order-section">
-			<ng-container *ngIf="orderItems$ | async as orderItems">
+			<ng-container *ngIf="order$ | async as order">
 				<h3>Order</h3>
 				<div class="order-list">
-					<div class="order-card" *ngFor="let orderItem of orderItems">
+					<div class="order-card" *ngFor="let orderItem of order.items">
 						<div class="order-item">
 							<div>
 								<div>{{orderItem.product.title}}</div>
@@ -51,15 +51,15 @@
 							</div>
 							<div>${{orderItem.sum | number : '1.2-2'}}</div>
 						</div>
-						<div class="remove-item" (click)="removeOrderItem(orderItem.product.id)">x</div>
+						<div class="remove-item" (click)="removeOrderItem(orderItem)">x</div>
 					</div>
 				</div>
 				<div class="order-summary">
 					<div class="order-total">
 						<div>Total:</div>
-						<div>{{ orderTotal$ | async | number : '1.2-2'}}$</div>
+						<div>{{ order.sum | number : '1.2-2'}}$</div>
 					</div>
-					<button [disabled]="!orderItems.length" (click)="confirmOrder()">Apply Order</button>
+					<button [disabled]="!order.items.length" (click)="confirmOrder()">Apply Order</button>
 				</div>
 			</ng-container>
 		</div>

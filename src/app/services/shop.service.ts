@@ -1,57 +1,33 @@
 import {Injectable} from '@angular/core';
 import {BehaviorSubject, concatMap, Observable, switchMap, tap} from 'rxjs';
-import {IOrderItem, IProduct} from '../models';
+import {IOrderItem, IProduct, IOrder} from '../models';
 import {StorageService} from '../storage.service';
+import {OrderService} from "./order.service";
 
 @Injectable({
 	providedIn: 'root'
 })
 export class ShopService {
 
-	private _orderItems: Map<string, IOrderItem> = new Map();
-
-	private _orderItems$ = new BehaviorSubject<IOrderItem[]>([]);
-	private _orderTotal$ = new BehaviorSubject<number>(0);
 	private _products$ = new BehaviorSubject<IProduct[]>([]);
 
-	constructor(private storageService: StorageService) {
+	constructor(private storageService: StorageService, private orderService: OrderService) {
 	}
 
 	get products$(): Observable<IProduct[]> {
 		return this.fetchProducts().pipe(concatMap(() => this._products$.asObservable()));
 	}
 
-	get orderTotal$(): Observable<number> {
-		return this._orderTotal$.asObservable();
-	}
-
-	get orderItems$(): Observable<any> {
-		return this._orderItems$.asObservable();
+	get order$(): Observable<IOrder> {
+		return this.orderService.order$;
 	}
 
 	addOrderItem(product: IProduct, amount: number) {
-		if (!amount) {
-			return
-		}
-
-		this._orderItems.set(product.id, {
-			product,
-			amount,
-			sum: (product.price * (1 - product.discountPercentage * 0.01)) * amount
-		});
-		this.updateOrderTotal();
-		this.emitNewOrderList();
+		this.orderService.addOrderItem(product, amount);
 	}
 
-	deleteOrderItem(id: string) {
-		this._orderItems.delete(id);
-		this.updateOrderTotal();
-		this.emitNewOrderList();
-	}
-
-	updateOrderTotal(): void {
-		const total = Array.from(this._orderItems.values()).reduce((sum: number, orderItem) => sum + orderItem.sum, 0)
-		this._orderTotal$.next(total);
+	deleteOrderItem(product: IOrderItem) {
+		this.orderService.delete(product)
 	}
 
 	confirmOrder(): Observable<IProduct[]> {
@@ -59,26 +35,20 @@ export class ShopService {
 
 		return this.storageService.setItem('products', updatedProductList).pipe(
 			switchMap(() => this.products$),
-			tap(() => {
-				this._orderItems.clear();
-				this.emitNewOrderList();
-				this.updateOrderTotal();
-			}),
+			tap(() => this.orderService.clear()),
 		);
 	}
 
 	private getUpdatedProductsList(): IProduct[] {
+		const orderList = this.orderService.orderItems;
+
 		return this._products$.getValue().map((product: IProduct) => {
-			const item = this._orderItems.get(product.id) as IOrderItem;
+			const item = orderList.find(orderItem => orderItem.id === product.id) as IOrderItem;
 			return {
 				...product,
-				stock: this._orderItems.has(product.id) ? product.stock - item.amount : product.stock
+				stock: item ? product.stock - item.amount : product.stock
 			}
 		}).filter((product: any) => product.stock);
-	}
-
-	private emitNewOrderList() {
-		this._orderItems$.next(Array.from(this._orderItems.values()))
 	}
 
 	private fetchProducts(): Observable<IProduct[]> {
