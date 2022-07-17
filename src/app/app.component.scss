@@ -5,6 +5,7 @@
   box-sizing: border-box;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  user-select: none;
 }
 
 h1,
@@ -55,6 +56,7 @@ p {
     flex-grow: 2;
     width: 100%;
     overflow: hidden;
+    padding-bottom: 10px;
 
     .products-section {
       width: 70%;
