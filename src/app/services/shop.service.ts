@@ -1,21 +1,20 @@
-import {Injectable} from '@angular/core';
-import {BehaviorSubject, concatMap, Observable, switchMap, tap} from 'rxjs';
-import {IOrderItem, IProduct, IOrder} from '../models';
-import {StorageService} from '../storage.service';
-import {OrderService} from "./order.service";
+import {Inject, Injectable} from '@angular/core';
+import {Observable, switchMap, tap} from 'rxjs';
+import {IOrderItem, IProduct, IOrder, OrderItem, OrderServiceType, ProductsServiceType} from '../models';
+import {ORDER_SERVICE_TOKEN, PRODUCTS_SERVICE_TOKEN} from '../tokens';
 
 @Injectable({
 	providedIn: 'root'
 })
 export class ShopService {
 
-	private _products$ = new BehaviorSubject<IProduct[]>([]);
-
-	constructor(private storageService: StorageService, private orderService: OrderService) {
+	constructor(
+		@Inject(ORDER_SERVICE_TOKEN) private orderService: OrderServiceType,
+		@Inject(PRODUCTS_SERVICE_TOKEN) private productsService: ProductsServiceType) {
 	}
 
 	get products$(): Observable<IProduct[]> {
-		return this.fetchProducts().pipe(concatMap(() => this._products$.asObservable()));
+		return this.productsService.products$;
 	}
 
 	get order$(): Observable<IOrder> {
@@ -23,17 +22,15 @@ export class ShopService {
 	}
 
 	addOrderItem(product: IProduct, amount: number) {
-		this.orderService.addOrderItem(product, amount);
+		this.orderService.addItem(new OrderItem(product, amount));
 	}
 
 	deleteOrderItem(product: IOrderItem) {
-		this.orderService.delete(product)
+		this.orderService.deleteItem(product)
 	}
 
 	confirmOrder(): Observable<IProduct[]> {
-		const updatedProductList = this.getUpdatedProductsList();
-
-		return this.storageService.setItem('products', updatedProductList).pipe(
+		return this.productsService.updateProducts(this.getUpdatedProductsList()).pipe(
 			switchMap(() => this.products$),
 			tap(() => this.orderService.clear()),
 		);
@@ -42,18 +39,12 @@ export class ShopService {
 	private getUpdatedProductsList(): IProduct[] {
 		const orderList = this.orderService.orderItems;
 
-		return this._products$.getValue().map((product: IProduct) => {
+		return this.productsService.products.map((product: IProduct) => {
 			const item = orderList.find(orderItem => orderItem.id === product.id) as IOrderItem;
 			return {
 				...product,
 				stock: item ? product.stock - item.amount : product.stock
 			}
 		}).filter((product: any) => product.stock);
-	}
-
-	private fetchProducts(): Observable<IProduct[]> {
-		return (this.storageService.getItem('products') as Observable<IProduct[]>).pipe(
-			tap(products => this._products$.next(products))
-		);
 	}
 }

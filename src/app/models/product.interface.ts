@@ -1,3 +1,5 @@
+import {IProductsManager} from "./products-manager.interface";
+
 export interface IProduct {
 	id: string;
 	title: string;
@@ -7,3 +9,6 @@ export interface IProduct {
 	price: number;
 	description: string;
 }
+
+export type GenericProductsServiceType<Products> = IProductsManager<Products>;
+export type ProductsServiceType = GenericProductsServiceType<IProduct>;

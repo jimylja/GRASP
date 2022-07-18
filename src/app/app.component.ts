@@ -23,6 +23,10 @@ export class AppComponent implements OnInit {
 	}
 
 	addOrderItem(product: IProduct, amount: number) {
+		if (!amount) {
+			return;
+		}
+
 		this.shopService.addOrderItem(product, amount);
 	}
 

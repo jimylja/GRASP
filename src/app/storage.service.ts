@@ -2,11 +2,12 @@ import {Injectable} from '@angular/core';
 import {NgForage} from 'ngforage';
 
 import {from, Observable} from 'rxjs';
+import {CrudServiceType} from './models';
 
 @Injectable({
 	providedIn: 'root'
 })
-export class StorageService {
+export class StorageService implements CrudServiceType {
 
 	constructor(private readonly ngf: NgForage) {
 	}
@@ -15,7 +16,15 @@ export class StorageService {
 		return from(this.ngf.getItem(key));
 	}
 
-	setItem(key: string, value: unknown): Observable<unknown> {
+	addItem(key: string, value: unknown): Observable<unknown> {
 		return from(this.ngf.setItem(key, value));
+	}
+
+	deleteItem(key: string): void | Observable<void> {
+		return from(this.ngf.removeItem(key));
+	}
+
+	updateItem(key: string, item: unknown): Observable<unknown> {
+		return from(this.ngf.setItem(key, item));
 	}
 }
