@@ -1,0 +1,10 @@
+:host {
+  padding-bottom: 10px;
+
+  .order-total {
+    display: flex;
+    justify-content: space-between;
+    padding-bottom: 5px;
+    font-weight: bold;
+  }
+}

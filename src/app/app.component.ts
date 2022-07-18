@@ -1,5 +1,5 @@
-import {ChangeDetectorRef, Component, OnInit} from '@angular/core';
-import {IProduct, IOrderItem, IOrder} from './models';
+import {Component, OnInit} from '@angular/core';
+import {IProduct, IOrderItem, IOrder, IAddOrderItemEvent} from './models';
 import {ShopService} from './services';
 import {Observable} from 'rxjs';
 
@@ -14,7 +14,7 @@ export class AppComponent implements OnInit {
 	products$!: Observable<IProduct[]>;
 	order$!: Observable<IOrder>;
 
-	constructor(private shopService: ShopService, private cdr: ChangeDetectorRef) {
+	constructor(private shopService: ShopService) {
 	}
 
 	ngOnInit() {
@@ -22,11 +22,9 @@ export class AppComponent implements OnInit {
 		this.order$ = this.shopService.order$;
 	}
 
-	addOrderItem(product: IProduct, amount: number) {
-		if (!amount) {
-			return;
-		}
 
+	addOrderItem(addOrderItemEvent: IAddOrderItemEvent) {
+		const {product, amount} = addOrderItemEvent;
 		this.shopService.addOrderItem(product, amount);
 	}
 
@@ -36,9 +34,5 @@ export class AppComponent implements OnInit {
 
 	confirmOrder(): void {
 		this.shopService.confirmOrder().subscribe();
-	}
-
-	checkChanges() {
-		this.cdr.detectChanges()
 	}
 }

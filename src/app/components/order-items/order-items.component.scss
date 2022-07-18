@@ -1,0 +1,33 @@
+:host {
+  flex-grow: 2;
+}
+
+.order-card {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+
+  .order-item {
+    display: flex;
+    justify-content: space-between;
+    padding-right: 25px;
+    align-items: center;
+    width: 100%;
+  }
+
+  .remove-item {
+    border-radius: 50%;
+    color: #fff;
+    background: crimson;
+    width: 18px;
+    height: 18px;
+    line-height: 20px;
+    display: flex;
+    align-items: self-end;
+    justify-content: center;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}

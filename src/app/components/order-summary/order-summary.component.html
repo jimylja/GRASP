@@ -1,0 +1,7 @@
+<div class="order-summary">
+	<div class="order-total">
+		<div>Total:</div>
+		<div>{{ order.sum | number : '1.2-2'}}$</div>
+	</div>
+	<button [disabled]="!order.items.length" (click)="confirmOrder()">Apply Order</button>
+</div>

@@ -1,0 +1,12 @@
+<div class="order-list">
+	<div class="order-card" *ngFor="let orderItem of orderItems">
+		<div class="order-item">
+			<div>
+				<div>{{orderItem.product.title}}</div>
+				<div>{{orderItem.amount}} items</div>
+			</div>
+			<div>${{orderItem.sum | number : '1.2-2'}}</div>
+		</div>
+		<div class="remove-item" (click)="removeOrderItem(orderItem)">x</div>
+	</div>
+</div>

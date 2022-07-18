@@ -7,10 +7,14 @@ import {StorageService} from './storage.service';
 import {ORDER_SERVICE_TOKEN, PRODUCTS_SERVICE_TOKEN, CRUD_SERVICE_TOKEN} from './tokens';
 import {OrderService} from './services';
 import {ProductsService} from './services/products.service';
+import {OrderItemsComponent, ProductComponent, OrderSummaryComponent} from "./components";
 
 @NgModule({
 	declarations: [
-		AppComponent
+		AppComponent,
+		ProductComponent,
+		OrderItemsComponent,
+		OrderSummaryComponent
 	],
 	imports: [
 		BrowserModule,

@@ -1,0 +1,20 @@
+<div class="product-thumbnail">
+	<img [src]="product.thumbnail" alt="">
+</div>
+<div class="product-details">
+	<div class="title">{{product.title}}</div>
+	<div class="description">{{product.description}}</div>
+</div>
+<div class="product-price">
+	<div class="price">${{product.price}}</div>
+	<div class="discount">{{product.discountPercentage}}%</div>
+</div>
+<div class="product-order">
+	<div class="product-order-controls">
+		<div><input type="number" #Input min="0" (change)="checkChanges()"></div>
+		<button [disabled]="!(+Input.value) || +Input.value > product.stock"
+		        (click)="addOrderItem(product, +Input.value)">Add
+		</button>
+	</div>
+	<div>Stock: {{product.stock}}</div>
+</div>

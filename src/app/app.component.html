@@ -14,53 +14,18 @@
 			<h3>Products List</h3>
 			<div class="products-list">
 				<ng-container *ngIf="products$ | async as products">
-					<div class="product-card" *ngFor="let product of products">
-						<div class="product-thumbnail">
-							<img [src]="product.thumbnail" alt="">
-						</div>
-						<div class="product-details">
-							<div class="title">{{product.title}}</div>
-							<div class="description">{{product.description}}</div>
-						</div>
-						<div class="product-price">
-							<div class="price">${{product.price}}</div>
-							<div class="discount">{{product.discountPercentage}}%</div>
-						</div>
-						<div class="product-order">
-							<div class="product-order-controls">
-								<div><input type="number" #Input min="0" (change)="checkChanges()"></div>
-								<button [disabled]="!(+Input.value) || +Input.value > product.stock"
-								        (click)="addOrderItem(product, +Input.value)">Add
-								</button>
-							</div>
-							<div>Stock: {{product.stock}}</div>
-						</div>
-					</div>
+					<app-product *ngFor="let product of products"
+					             [product]="product"
+					             (orderItemAdded)="addOrderItem($event)">
+					</app-product>
 				</ng-container>
 			</div>
 		</div>
 		<div class="order-section">
 			<ng-container *ngIf="order$ | async as order">
 				<h3>Order</h3>
-				<div class="order-list">
-					<div class="order-card" *ngFor="let orderItem of order.items">
-						<div class="order-item">
-							<div>
-								<div>{{orderItem.product.title}}</div>
-								<div>{{orderItem.amount}} items</div>
-							</div>
-							<div>${{orderItem.sum | number : '1.2-2'}}</div>
-						</div>
-						<div class="remove-item" (click)="removeOrderItem(orderItem)">x</div>
-					</div>
-				</div>
-				<div class="order-summary">
-					<div class="order-total">
-						<div>Total:</div>
-						<div>{{ order.sum | number : '1.2-2'}}$</div>
-					</div>
-					<button [disabled]="!order.items.length" (click)="confirmOrder()">Apply Order</button>
-				</div>
+				<app-order-items [orderItems]="order.items" (orderItemDeleted)="removeOrderItem($event)"></app-order-items>
+				<app-order-summary [order]="order" (orderConfirmed)="confirmOrder()"></app-order-summary>
 			</ng-container>
 		</div>
 	</div>
